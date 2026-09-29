@@ -1,19 +1,54 @@
 package edu.fscj.cen3024c.taskmanager.entities;
 
-public class Task {
-    private Integer id;
-    private String title;
-    private String description;
-    private String status; // PENDING, IN_PROGRESS, COMPLETED
-    private String dueDate; // YYYY-MM-DD
+import jakarta.persistence.*;
+import java.util.List;
+import java.util.Set;
 
-    public Task(String title, String description, String status, String dueDate){
+@Entity
+@Table(name = "tasks")
+public class Task {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(nullable = false)
+    private String title;
+
+    private String description;
+
+    @Column(nullable = false, length = 20)
+    private String status;
+
+    @Column(name = "due_date", length = 10)
+    private String dueDate;
+
+    @ManyToOne
+    @JoinColumn(name = "priority_id")
+    private Priority priority;
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Subtask> subtasks;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_tasks",
+            joinColumns = @JoinColumn(name = "task_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> users;
+
+    // Constructors
+    public Task() {}
+
+    public Task(String title, String description, String status, String dueDate) {
         this.title = title;
         this.description = description;
         this.status = status;
         this.dueDate = dueDate;
     }
 
+    // Getters & setters
     public Integer getId() {
         return id;
     }
@@ -53,6 +88,28 @@ public class Task {
     public void setDueDate(String dueDate) {
         this.dueDate = dueDate;
     }
+
+    public Priority getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority;
+    }
+
+    public List<Subtask> getSubtasks() {
+        return subtasks;
+    }
+
+    public void setSubtasks(List<Subtask> subtasks) {
+        this.subtasks = subtasks;
+    }
+
+    public Set<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<User> users) {
+        this.users = users;
+    }
 }
-
-
